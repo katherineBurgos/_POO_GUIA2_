@@ -291,7 +291,7 @@ class MatriculaController(CrudAcademicoMixin, CrudBase):
         return self._guardar_objeto(matricula)
 
     def boletin(self, estudiante_id):
-        matriculas = [m for m in self.listar() if m.estudiante_id == int(estudiante_id)]
+        matriculas = [m for m in self.leer() if m.estudiante_id == int(estudiante_id)]
         if not matriculas:
             return f"No hay matrículas para el estudiante {estudiante_id}"
         lineas = [f"BOLETÍN DEL ESTUDIANTE #{estudiante_id}", "=" * 48]
@@ -304,4 +304,4 @@ class MatriculaController(CrudAcademicoMixin, CrudBase):
                 promedios.append(float(m.promedio))
         lineas.append("-" * 48)
         lineas.append(f"Promedio general: {sum(promedios)/len(promedios):.2f}" if promedios else "Promedio general: sin notas")
-        return "\\n".join(lineas)
+        return "\n".join(lineas)

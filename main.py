@@ -1,10 +1,13 @@
 # main.py es la VISTA: lo único que habla con el usuario (input/print).
 # No valida ni guarda nada: le pide todo a los controladores de views.py
 # y solo muestra lo que ellos responden.
+from tkinter import Tk, messagebox
+
 from shared.herramientas import (
     imprimir_titulo, imprimir_exito, imprimir_error, imprimir_info, confirmar
 )
 from views import ClienteController, ProductoController, VentaController
+from views_academico import EstudianteController, MateriaController, MatriculaController
 
 
 class Menu:
@@ -15,6 +18,9 @@ class Menu:
         self.clientes = ClienteController()
         self.productos = ProductoController()
         self.ventas = VentaController(self.clientes, self.productos)
+        self.estudiantes = EstudianteController()
+        self.materias = MateriaController()
+        self.matriculas = MatriculaController(self.estudiantes, self.materias)
 
     # ---------- ayudas ----------
     def pausa(self):
@@ -41,6 +47,7 @@ class Menu:
             print("  1. Clientes")
             print("  2. Productos")
             print("  3. Ventas")
+            print("  4. Estudiantes (solo académico)")
             print("  0. Salir\n")
             opcion = input("Opción: ").strip()
 
@@ -50,6 +57,8 @@ class Menu:
                 self.menu_crud(self.productos)
             elif opcion == "3":
                 self.menu_crud(self.ventas)
+            elif opcion == "4":
+                self.menu_estudiante()
             elif opcion == "0":
                 imprimir_info("¡Hasta luego! 👋")
                 break
@@ -93,6 +102,44 @@ class Menu:
                 self.eliminar(controlador)
             elif opcion == "7" and controlador == self.ventas:
                 self.ver_factura()
+            elif opcion == "0":
+                break
+            else:
+                imprimir_error("Opción no válida")
+                self.pausa()
+
+    def menu_estudiante(self):
+        titulo = "ESTUDIANTES"
+
+        while True:
+            imprimir_titulo(titulo)
+            print("  1. Crear estudiante")
+            print("  2. Ver todos")
+            print("  3. Buscar")
+            print("  4. Ver por id")
+            print("  5. Actualizar")
+            print("  6. Eliminar")
+            print("  7. Ver boletín")
+            print("  8. Registrar matrícula")
+            print("  0. Volver\n")
+            opcion = input("Opción: ").strip()
+
+            if opcion == "1":
+                self.crear(self.estudiantes)
+            elif opcion == "2":
+                self.ver_todos(self.estudiantes)
+            elif opcion == "3":
+                self.buscar(self.estudiantes)
+            elif opcion == "4":
+                self.ver_por_id(self.estudiantes)
+            elif opcion == "5":
+                self.actualizar(self.estudiantes)
+            elif opcion == "6":
+                self.eliminar(self.estudiantes)
+            elif opcion == "7":
+                self.ver_boletin_estudiante()
+            elif opcion == "8":
+                self.registrar_matricula()
             elif opcion == "0":
                 break
             else:
@@ -225,6 +272,42 @@ class Menu:
             imprimir_error("No existe esa venta")
         else:
             print(texto)
+        self.pausa()
+
+    def registrar_matricula(self):
+        imprimir_titulo("REGISTRAR MATRÍCULA")
+        id_estudiante = self.pedir_entero("Id del estudiante: ")
+        id_materia = self.pedir_entero("Id de la materia: ")
+        periodo = input("Periodo (opcional): ").strip() or "2026-1"
+
+        if id_estudiante is None or id_materia is None:
+            imprimir_error("Los ids deben ser números")
+            self.pausa()
+            return
+
+        exito, mensaje = self.matriculas.crear({
+            "estudiante_id": id_estudiante,
+            "materia_id": id_materia,
+            "periodo": periodo,
+        })
+        self.mostrar_resultado(exito, mensaje)
+        self.pausa()
+
+    def ver_boletin_estudiante(self):
+        imprimir_titulo("BOLETÍN")
+        id_estudiante = self.pedir_entero("Id del estudiante: ")
+        if id_estudiante is None:
+            imprimir_error("El id debe ser un número")
+            self.pausa()
+            return
+
+        texto = self.matriculas.boletin(id_estudiante)
+        ventana = Tk()
+        ventana.withdraw()
+        try:
+            messagebox.showinfo("Boletín del estudiante", texto, parent=ventana)
+        finally:
+            ventana.destroy()
         self.pausa()
 
 

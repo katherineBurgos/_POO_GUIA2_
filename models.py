@@ -40,7 +40,9 @@ class ModeloBase(ABC):
 
     def __str__(self):
         # POLIMORFISMO: el mismo print() muestra distinto según la clase
-        return f"[{self.id}] {self.etiqueta()}"
+        # Los ids siguen siendo numéricos para trabajar con el sistema, pero
+        # se muestran con 4 dígitos para que luzcan como 0001, 0002, etc.
+        return f"[{self.id:04d}] {self.etiqueta()}"
 
 
 # =====================================================================

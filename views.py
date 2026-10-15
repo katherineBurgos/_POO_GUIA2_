@@ -392,7 +392,7 @@ class VentaController(CrudBase):
         else:
             nombre_cliente = cliente.nombre_completo
 
-        texto = f"FACTURA #{venta.id}   fecha: {venta.fecha}\n"
+        texto = f"FACTURA #{venta.id:04d}   fecha: {venta.fecha}\n"
         texto += f"Cliente: {nombre_cliente}\n"
         texto += "-" * 46 + "\n"
         for detalle in venta.detalles:
